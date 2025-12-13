@@ -1,0 +1,73 @@
+<div class="content-header">
+  <h2>Items Sold</h2>
+  <p class="text-muted">Track your completed sales</p>
+</div>
+
+<% if (!orders || orders.length === 0) { %>
+<div class="empty-state text-center py-5">
+  <i class="bi bi-receipt display-1 text-muted"></i>
+  <h4 class="mt-3">No Sales Yet</h4>
+  <p class="text-muted">Share your store link to start selling!</p>
+</div>
+<% } else { %>
+
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Product</th>
+        <th>Buyer</th>
+        <th>Qty</th>
+        <th>Total</th>
+        <th>County</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(order => { %>
+      <tr>
+        <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+        <td><%= order.productId ? order.productId.name : 'N/A' %></td>
+        <td>
+          <%= order.buyerName %><br>
+          <small class="text-muted"><%= order.buyerPhone %></small>
+        </td>
+        <td><%= order.quantity %></td>
+        <td class="fw-bold">KES <%= order.totalPrice %></td>
+        <td><%= order.county %></td>
+        <td>
+          <span class="badge bg-<%= order.paymentStatus === 'completed' ? 'success' : 'warning' %>">
+            <%= order.paymentStatus %>
+          </span>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card bg-light mt-4">
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-6 col-md-3">
+        <h4><%= orders.length %></h4>
+        <small class="text-muted">Total Orders</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h4>KES <%= orders.reduce((sum, o) => sum + o.totalPrice, 0) %></h4>
+        <small class="text-muted">Total Revenue</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h4><%= orders.reduce((sum, o) => sum + o.quantity, 0) %></h4>
+        <small class="text-muted">Items Sold</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h4>KES <%= orders.reduce((sum, o) => sum + (o.unitPrice - (o.productId ? o.productId.basePrice : 0)) * o.quantity, 0) %></h4>
+        <small class="text-muted">Your Profit</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% } %>

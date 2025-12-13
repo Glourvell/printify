@@ -1,0 +1,162 @@
+<%- include('../partials/header') %>
+
+<div class="buyer-store">
+  <nav class="store-header">
+    <div class="container">
+      <h3><i class="bi bi-shop me-2"></i><%= seller.storeName %></h3>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <% if (products.length === 0) { %>
+    <div class="empty-state text-center py-5">
+      <i class="bi bi-box-seam display-1 text-muted"></i>
+      <h4 class="mt-3">No Products Available</h4>
+      <p class="text-muted">This store hasn't added any products yet.</p>
+    </div>
+    <% } else { %>
+    
+    <div class="row g-4">
+      <% products.forEach(product => { %>
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100 buyer-product-card" data-product='<%- JSON.stringify({_id: product._id, name: product.name, sellerPrice: product.sellerPrice, baseImage: product.baseImage, logoUrl: product.logoUrl, description: product.description}) %>'>
+          <div class="card-img-wrapper position-relative">
+            <img src="<%= product.baseImage %>" class="card-img-top" alt="<%= product.name %>">
+            <% if (product.logoUrl) { %>
+            <img src="<%= product.logoUrl %>" class="logo-thumb" alt="Logo">
+            <% } %>
+          </div>
+          <div class="card-body">
+            <h6 class="card-title"><%= product.name %></h6>
+            <p class="card-text text-primary fw-bold fs-5">KES <%= product.sellerPrice %></p>
+            <button class="btn btn-primary w-100 buy-now-btn">
+              <i class="bi bi-cart-plus me-2"></i>Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+    
+    <% } %>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-cart-check me-2"></i>Complete Your Order</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="orderForm">
+        <div class="modal-body">
+          <input type="hidden" name="productId" id="orderProductId">
+          
+          <div class="row">
+            <div class="col-md-5 mb-3">
+              <div class="product-summary card bg-light">
+                <div class="card-body text-center">
+                  <img src="" id="orderProductImage" class="img-fluid mb-2" style="max-height: 150px;">
+                  <h5 id="orderProductName"></h5>
+                  <p class="text-primary fw-bold fs-4" id="orderProductPrice"></p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-7">
+              <div class="mb-3">
+                <label class="form-label">Your Full Name</label>
+                <input type="text" class="form-control" name="buyerName" required>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Phone Number (M-Pesa)</label>
+                <div class="input-group">
+                  <span class="input-group-text">+254</span>
+                  <input type="tel" class="form-control" name="buyerPhone" placeholder="7XXXXXXXX" required>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Email (Optional)</label>
+                <input type="email" class="form-control" name="buyerEmail" placeholder="your@email.com">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <div class="input-group">
+                  <button type="button" class="btn btn-outline-secondary" id="qtyMinus">-</button>
+                  <input type="number" class="form-control text-center" name="quantity" id="orderQuantity" value="1" min="1" max="100">
+                  <button type="button" class="btn btn-outline-secondary" id="qtyPlus">+</button>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Delivery County</label>
+                <select class="form-select" name="county" required>
+                  <option value="">Select County</option>
+                  <% counties.forEach(county => { %>
+                  <option value="<%= county %>"><%= county %></option>
+                  <% }); %>
+                </select>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Delivery Address (Optional)</label>
+                <textarea class="form-control" name="deliveryAddress" rows="2" placeholder="Street, Building, etc."></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-total bg-success text-white p-3 rounded mt-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Total Amount:</h5>
+              <h4 class="mb-0" id="orderTotal">KES 0</h4>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-phone me-2"></i>Pay via M-Pesa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Processing Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-body py-5">
+        <div id="paymentLoading">
+          <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;"></div>
+          <h5>Processing Payment...</h5>
+          <p class="text-muted">Please check your phone for the M-Pesa prompt</p>
+        </div>
+        <div id="paymentSuccess" style="display: none;">
+          <i class="bi bi-check-circle-fill text-success display-1"></i>
+          <h5 class="mt-3">Payment Successful!</h5>
+          <p class="text-muted">Thank you for your order. You will receive a confirmation soon.</p>
+          <button class="btn btn-primary" onclick="location.reload()">Continue Shopping</button>
+        </div>
+        <div id="paymentError" style="display: none;">
+          <i class="bi bi-x-circle-fill text-danger display-1"></i>
+          <h5 class="mt-3">Payment Failed</h5>
+          <p class="text-muted" id="paymentErrorMsg">Something went wrong. Please try again.</p>
+          <button class="btn btn-primary" data-bs-dismiss="modal">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const storeSlug = '<%= storeSlug %>';
+</script>
+<script src="/js/buyer.js"></script>
+<%- include('../partials/footer') %>

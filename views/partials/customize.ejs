@@ -1,0 +1,128 @@
+<div class="content-header">
+  <a href="/dashboard/catalog" class="btn btn-link p-0 mb-2">
+    <i class="bi bi-arrow-left me-2"></i>Back to Catalog
+  </a>
+  <h2>Customize <%= item.name %></h2>
+</div>
+
+<div class="row">
+  <div class="col-lg-6 mb-4">
+    <div class="product-preview card">
+      <div class="card-body text-center">
+        <div class="preview-container">
+          <img src="<%= item.image %>" alt="<%= item.name %>" class="base-product-img" id="baseProductImg">
+          <img src="" alt="Logo" class="logo-overlay" id="logoOverlay" style="display: none;">
+        </div>
+        <div class="logo-position-indicator mt-3">
+          <span class="badge bg-secondary" id="positionBadge">Logo Position: Front</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <form id="customizeForm" enctype="multipart/form-data">
+          <input type="hidden" name="catalogItemId" value="<%= item.id %>">
+          <input type="hidden" name="category" value="<%= category %>">
+          
+          <div class="mb-3">
+            <label class="form-label">Product Name</label>
+            <input type="text" class="form-control" name="name" value="<%= item.name %>" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Base Price (Our Price)</label>
+            <div class="input-group">
+              <span class="input-group-text">KES</span>
+              <input type="number" class="form-control" value="<%= item.basePrice %>" disabled>
+            </div>
+            <small class="text-muted">This is our base price for this item</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Your Selling Price</label>
+            <div class="input-group">
+              <span class="input-group-text">KES</span>
+              <input type="number" class="form-control" name="sellerPrice" value="<%= item.basePrice + 200 %>" min="<%= item.basePrice %>" required>
+            </div>
+            <small class="text-muted">Set your price (must be at least KES <%= item.basePrice %>)</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Your Profit</label>
+            <div class="input-group">
+              <span class="input-group-text">KES</span>
+              <input type="number" class="form-control bg-success-subtle" id="profitDisplay" value="200" disabled>
+            </div>
+          </div>
+          
+          
+
+
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="3"><%= item.description %></textarea>
+          </div>
+          <!-- <div class="mb-3">
+            <label class="form-label">Size</label>
+            <select class="form-control" name="size" required>
+              <option value="">Select a size</option>
+              <option value="xs">Extra Small</option>
+              <option value="s">Small</option>
+              <option value="m">Medium</option>
+              <option value="l">Large</option>
+              <option value="xl">Extra Large</option>
+              <option value="xxl">2XL</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Color</label>
+            <select class="form-control" name="color" required>
+              <option value="">Select a color</option>
+              <option value="black">Black</option>
+              <option value="white">White</option>
+              <option value="red">Red</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <option value="navy">Navy</option>
+              <option value="gray">Gray</option>
+            </select>
+          </div> -->
+          
+          <div class="mb-3">
+            <label class="form-label">Upload Your Logo</label>
+            <input type="file" class="form-control" name="logo" id="logoInput" accept="image/*">
+            <small class="text-muted">Recommended: PNG with transparent background</small>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">Logo Position</label>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="logoPosition" id="posFront" value="front" checked>
+              <label class="btn btn-outline-primary" for="posFront">Front</label>
+              
+              <input type="radio" class="btn-check" name="logoPosition" id="posBack" value="back">
+              <label class="btn btn-outline-primary" for="posBack">Back</label>
+              
+              <input type="radio" class="btn-check" name="logoPosition" id="posLeft" value="left">
+              <label class="btn btn-outline-primary" for="posLeft">Left</label>
+              
+              <input type="radio" class="btn-check" name="logoPosition" id="posRight" value="right">
+              <label class="btn btn-outline-primary" for="posRight">Right</label>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-plus-circle me-2"></i>Add to My Products
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/customize.js"></script>

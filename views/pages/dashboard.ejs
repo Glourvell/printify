@@ -1,0 +1,83 @@
+<%- include('../partials/header') %>
+
+<div class="dashboard-container">
+  <!-- Mobile Header -->
+  <nav class="mobile-header d-lg-none">
+    <button class="btn btn-link hamburger-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+      <i class="bi bi-list fs-2"></i>
+    </button>
+    <h5 class="mb-0"><i class="bi bi-printer"></i> Printspoint</h5>
+    <a href="/dashboard/profile" class="profile-img-link">
+      <img src="<%= user.photoURL || '/images/default-avatar.png' %>" alt="Profile" class="profile-img-sm">
+    </a>
+  </nav>
+
+  <!-- Mobile Offcanvas Menu -->
+  <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+      <h5><i class="bi bi-printer"></i> Printspoint</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <nav class="nav flex-column">
+        <a class="nav-link <%= page === 'catalog' ? 'active' : '' %>" href="/dashboard/catalog">
+          <i class="bi bi-grid me-2"></i>Catalog
+        </a>
+        <a class="nav-link <%= page === 'my-products' ? 'active' : '' %>" href="/dashboard/my-products">
+          <i class="bi bi-box me-2"></i>My Products
+        </a>
+        <a class="nav-link <%= page === 'items-sold' ? 'active' : '' %>" href="/dashboard/items-sold">
+          <i class="bi bi-receipt me-2"></i>Items Sold
+        </a>
+        <hr>
+        <a class="nav-link text-danger" href="/logout">
+          <i class="bi bi-box-arrow-right me-2"></i>Logout
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar d-none d-lg-flex">
+    <div class="sidebar-header">
+      <h4><i class="bi bi-printer"></i> Printspoint</h4>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-link <%= page === 'profile' ? 'active' : '' %>" href="/dashboard/profile">
+        <i class="bi bi-person me-2"></i>Profile
+      </a>
+      <a class="nav-link <%= page === 'catalog' ? 'active' : '' %>" href="/dashboard/catalog">
+        <i class="bi bi-grid me-2"></i>Catalog
+      </a>
+      <a class="nav-link <%= page === 'my-products' ? 'active' : '' %>" href="/dashboard/my-products">
+        <i class="bi bi-box me-2"></i>My Products
+      </a>
+      <a class="nav-link <%= page === 'items-sold' ? 'active' : '' %>" href="/dashboard/items-sold">
+        <i class="bi bi-receipt me-2"></i>Items Sold
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout" class="btn btn-outline-danger w-100">
+        <i class="bi bi-box-arrow-right me-2"></i>Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <% if (page === 'profile') { %>
+      <%- include('../partials/profile', { user, userData: data.userData || {} }) %>
+    <% } else if (page === 'catalog') { %>
+      <%- include('../partials/catalog', { catalogItems: data.catalogItems }) %>
+    <% } else if (page === 'customize') { %>
+      <%- include('../partials/customize', { item: data.item, category: data.category }) %>
+    <% } else if (page === 'my-products') { %>
+      <%- include('../partials/my-products', { products: data.products, storeCreated: data.storeCreated, storeName: data.storeName, storeSlug: data.storeSlug, domain: data.domain || '' }) %>
+    <% } else if (page === 'items-sold') { %>
+      <%- include('../partials/items-sold', { orders: data.orders }) %>
+    <% } %>
+  </main>
+</div>
+
+<script src="/js/dashboard.js"></script>
+<%- include('../partials/footer') %>
