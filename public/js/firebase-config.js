@@ -8,14 +8,6 @@ const firebaseConfig = {
   // storageBucket: `${window.FIREBASE_PROJECT_ID || ''}.appspot.com`,
   // appId: window.FIREBASE_APP_ID || ''
 
-  apiKey: "AIzaSyCBSlddxmk_B8DoT269rrvLdtBFlUplI78",
-  authDomain: "printify-ke.firebaseapp.com",
-  projectId: "printify-ke",
-  storageBucket: "printify-ke.firebasestorage.app",
-  messagingSenderId: "691292452284",
-  appId: "1:691292452284:web:98eb60d35ad13f254327b9",
-  measurementId: "G-2HLKKPT1C9"
-};
 
 let app = null;
 let auth = null;
