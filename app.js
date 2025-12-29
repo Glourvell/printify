@@ -14,10 +14,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // MongoDB Atlas connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI) // <- no options needed
+mongoose.connect(MONGODB_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch(err => console.error("❌ MongoDB connection error:", err.message));
 
@@ -32,21 +34,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session configuration with MongoDB store
+// ✅ FIX 2 — Session configuration updated for Render / HTTPS
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: false, // set true if using HTTPS in production
-    maxAge: 24 * 60 * 60 * 1000,
-    httpOnly: true
-  },
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
-    ttl: 24 * 60 * 60, // 1 day
+    ttl: 24 * 60 * 60,
     autoRemove: "native"
-  })
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000
+  }
 };
 
 app.use(session(sessionConfig));
@@ -55,7 +58,7 @@ app.use(session(sessionConfig));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Example test route
+// Routes
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
 import catalogRoutes from './routes/catalog.js';
@@ -70,8 +73,7 @@ app.use('/products', productRoutes);
 app.use('/store', storeRoutes);
 app.use('/shop', buyerRoutes);
 
-
-// Optional MongoDB test route
+// MongoDB test route
 app.get("/test-mongo", async (req, res) => {
   try {
     const admin = mongoose.connection.db.admin();
@@ -81,11 +83,6 @@ app.get("/test-mongo", async (req, res) => {
     res.send(`MongoDB connection failed: ${err.message}`);
   }
 });
-
-// Import your routes
-// Example:
-// import authRoutes from "./routes/auth.js";
-// app.use("/auth", authRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
