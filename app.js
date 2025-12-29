@@ -1,21 +1,23 @@
-const express = require("express");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const mongoose = require("mongoose");
-const path = require("path");
-const dotenv = require("dotenv");
+import express from "express";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
+import path from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
-const app = express();
+// For __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// ✅ FIX FOR RENDER SESSION COOKIES
-app.set('trust proxy', 1);
+const app = express();
 
 // MongoDB Atlas connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI) // <- no options needed
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch(err => console.error("❌ MongoDB connection error:", err.message));
 
@@ -30,16 +32,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ FIXED: MongoStore.create() for CommonJS + connect-mongo@6+
+// Session configuration with MongoDB store
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60 * 1000
+    secure: false, // set true if using HTTPS in production
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true
   },
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
@@ -54,13 +55,13 @@ app.use(session(sessionConfig));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Routes
-const authRoutes = require('./routes/auth');
-const dashboardRoutes = require('./routes/dashboard');
-const catalogRoutes = require('./routes/catalog');
-const productRoutes = require('./routes/products');
-const storeRoutes = require('./routes/store');
-const buyerRoutes = require('./routes/buyer');
+// Example test route
+import authRoutes from './routes/auth.js';
+import dashboardRoutes from './routes/dashboard.js';
+import catalogRoutes from './routes/catalog.js';
+import productRoutes from './routes/products.js';
+import storeRoutes from './routes/store.js';
+import buyerRoutes from './routes/buyer.js';
 
 app.use('/', authRoutes);
 app.use('/dashboard', dashboardRoutes);
@@ -68,6 +69,7 @@ app.use('/catalog', catalogRoutes);
 app.use('/products', productRoutes);
 app.use('/store', storeRoutes);
 app.use('/shop', buyerRoutes);
+
 
 // Optional MongoDB test route
 app.get("/test-mongo", async (req, res) => {
@@ -79,6 +81,11 @@ app.get("/test-mongo", async (req, res) => {
     res.send(`MongoDB connection failed: ${err.message}`);
   }
 });
+
+// Import your routes
+// Example:
+// import authRoutes from "./routes/auth.js";
+// app.use("/auth", authRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
