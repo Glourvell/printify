@@ -1,19 +1,15 @@
-import express from "express";
-import session from "express-session";
-import MongoStore from "connect-mongo";
-import mongoose from "mongoose";
-import path from "path";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
+const express = require("express");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const mongoose = require("mongoose");
+const path = require("path");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
-// For __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 
+// ✅ FIX FOR RENDER SESSION COOKIES
 app.set('trust proxy', 1);
 
 // MongoDB Atlas connection
@@ -34,22 +30,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ FIX 2 — Session configuration updated for Render / HTTPS
+// Session configuration with MongoDB store
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: MONGODB_URI,
-    ttl: 24 * 60 * 60,
-    autoRemove: "native"
-  }),
   cookie: {
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production", // ✅ FIX FOR RENDER HTTPS
     httpOnly: true,
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000
-  }
+  },
+  store: MongoStore.create({
+    mongoUrl: MONGODB_URI,
+    ttl: 24 * 60 * 60, // 1 day
+    autoRemove: "native"
+  })
 };
 
 app.use(session(sessionConfig));
@@ -59,12 +55,12 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Routes
-import authRoutes from './routes/auth.js';
-import dashboardRoutes from './routes/dashboard.js';
-import catalogRoutes from './routes/catalog.js';
-import productRoutes from './routes/products.js';
-import storeRoutes from './routes/store.js';
-import buyerRoutes from './routes/buyer.js';
+const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
+const catalogRoutes = require('./routes/catalog');
+const productRoutes = require('./routes/products');
+const storeRoutes = require('./routes/store');
+const buyerRoutes = require('./routes/buyer');
 
 app.use('/', authRoutes);
 app.use('/dashboard', dashboardRoutes);
@@ -73,7 +69,7 @@ app.use('/products', productRoutes);
 app.use('/store', storeRoutes);
 app.use('/shop', buyerRoutes);
 
-// MongoDB test route
+// Optional MongoDB test route
 app.get("/test-mongo", async (req, res) => {
   try {
     const admin = mongoose.connection.db.admin();
