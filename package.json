@@ -2,7 +2,6 @@
   "name": "printify",
   "version": "1.0.0",
   "description": "Printify Node.js EJS application",
-  "type": "module",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
