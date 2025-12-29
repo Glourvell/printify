@@ -30,18 +30,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session configuration with MongoDB store
+// ✅ FIXED: CommonJS-compatible MongoStore
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === "production", // ✅ FIX FOR RENDER HTTPS
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000
   },
-  store: MongoStore.create({
+  store: new MongoStore({
     mongoUrl: MONGODB_URI,
     ttl: 24 * 60 * 60, // 1 day
     autoRemove: "native"
