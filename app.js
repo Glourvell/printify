@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ FIXED: CommonJS-compatible MongoStore
+// ✅ FIXED: MongoStore.create() for CommonJS + connect-mongo@6+
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -41,7 +41,7 @@ const sessionConfig = {
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000
   },
-  store: new MongoStore({
+  store: MongoStore.create({
     mongoUrl: MONGODB_URI,
     ttl: 24 * 60 * 60, // 1 day
     autoRemove: "native"
