@@ -14,6 +14,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// ✅ Trust proxy for Render HTTPS
+app.set('trust proxy', 1);
+
 // MongoDB Atlas connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -32,19 +35,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session configuration with MongoDB store
+// ✅ Updated session configuration with MongoDB store for Render
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // set true if using HTTPS in production
-    maxAge: 24 * 60 * 60 * 1000,
-    httpOnly: true
+    secure: true,       // ✅ Use HTTPS on Render
+    httpOnly: true,
+    sameSite: "lax",    // ✅ Helps with cross-site requests
+    maxAge: 24 * 60 * 60 * 1000
   },
-  store: MongoStore.create({
+  store: new MongoStore({   // ✅ Constructor works with connect-mongo@6
     mongoUrl: MONGODB_URI,
-    ttl: 24 * 60 * 60, // 1 day
+    ttl: 24 * 60 * 60,      // 1 day
     autoRemove: "native"
   })
 };
@@ -55,7 +59,7 @@ app.use(session(sessionConfig));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Example test route
+// Routes
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
 import catalogRoutes from './routes/catalog.js';
@@ -70,7 +74,6 @@ app.use('/products', productRoutes);
 app.use('/store', storeRoutes);
 app.use('/shop', buyerRoutes);
 
-
 // Optional MongoDB test route
 app.get("/test-mongo", async (req, res) => {
   try {
@@ -81,11 +84,6 @@ app.get("/test-mongo", async (req, res) => {
     res.send(`MongoDB connection failed: ${err.message}`);
   }
 });
-
-// Import your routes
-// Example:
-// import authRoutes from "./routes/auth.js";
-// app.use("/auth", authRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
