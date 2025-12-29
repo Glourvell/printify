@@ -1,22 +1,32 @@
 {
-  "name": "printify",
+  "name": "printhub",
   "version": "1.0.0",
-  "description": "Printify Node.js EJS application",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "node app.js"
   },
-  "engines": {
-    "node": "18.x"
-  },
+  "keywords": [
+    "printify",
+    "print-on-demand",
+    "ecommerce"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Print-on-demand e-commerce platform",
   "dependencies": {
-    "express": "^4.19.2",
-    "express-session": "^1.17.3",
-    "connect-mongo": "^5.0.0",
-    "mongoose": "^8.0.0",
-    "ejs": "^3.1.9",
-    "dotenv": "^16.4.5",
-    "body-parser": "^1.20.2",
-    "request": "^2.88.2"
+    "axios": "^1.13.2",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "firebase": "^12.6.0",
+    "mongoose": "^9.0.1",
+    "multer": "^2.0.2",
+    "ngrok": "^5.0.0-beta.2",
+    "nodemailer": "^7.0.11",
+    "pdfkit": "^0.17.2",
+    "uuid": "^13.0.0"
   }
 }
